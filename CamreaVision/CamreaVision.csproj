@@ -16,4 +16,10 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="MVSDK">
+	    <HintPath>DllSource\MVSDK.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>

@@ -40,8 +40,7 @@ public partial class App : Application
     /// </summary>
     private void ConfigureServices(IServiceCollection services)
     {
-        services.AddZLogger();
-        services.AddApplicationServices();
+        services.AddApplicationServices();      
     }
 
     /// <summary>
