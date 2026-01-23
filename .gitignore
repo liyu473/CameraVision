@@ -1,0 +1,19 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.exe
+packages/
+*.nupkg
+TestResults/
+
+# JetBrains IDE
+.idea/
+*.iml
+*.iws
+out/
