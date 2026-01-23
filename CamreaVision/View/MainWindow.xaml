@@ -12,9 +12,29 @@
     Height="450"
     d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
     mc:Ignorable="d">
-    <Grid RowDefinitions="Auto,*">
-        <lyu:SimpleStackPanel Orientation="Horizontal" Spacing="24">
-            <Button Command="{Binding ScanCameraCommand}" Content="扫描相机" />
-        </lyu:SimpleStackPanel>
+    <Grid>
+        <TabControl>
+            <TabItem Header="MindVision">
+                <Grid RowDefinitions="Auto,*,2*">
+                    <lyu:SimpleStackPanel
+                        Grid.Row="0"
+                        Orientation="Horizontal"
+                        Spacing="24">
+                        <Button Command="{Binding ScanCameraCommand}" Content="扫描相机" />
+                    </lyu:SimpleStackPanel>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        lyu:DataGridRowNumberBehavior.HeaderText="序号"
+                        lyu:DataGridRowNumberBehavior.IsEnabled="True"
+                        AutoGenerateColumns="True"
+                        CanUserAddRows="False"
+                        CanUserSortColumns="False"
+                        ColumnWidth="*"
+                        ItemsSource="{Binding Cameras}">
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
