@@ -17,11 +17,16 @@ public class CameraService : ICameraService, IDisposable
 {
     private readonly ILogger<CameraService> _logger;
     private int _cameraHandle = -1;
+    private IntPtr _grabber = IntPtr.Zero;
     private tSdkCameraDevInfo _currentDeviceInfo;
+    private tSdkCameraDevInfo[]? _cachedDeviceList = null;
     private bool _isOpened = false;
     private bool _isCapturing = false;
     private CameraInfo? _currentCamera = null;
     private IntPtr _frameBuffer = IntPtr.Zero;
+    
+    // 保存回调委托引用，防止被GC回收导致闪退
+    private pfnCameraGrabberFrameCallback? _frameCallback;
 
     public bool IsOpened => _isOpened;
     public bool IsCapturing => _isCapturing;
@@ -41,7 +46,10 @@ public class CameraService : ICameraService, IDisposable
     {
         try
         {
+            _logger.ZLogInformation($"准备初始化SDK...");                   
+            _logger.ZLogInformation($"准备调用CameraSdkInit...");
             var status = MvApi.CameraSdkInit(1);
+            
             if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
                 _logger.ZLogInformation($"相机SDK初始化成功");
@@ -55,7 +63,7 @@ public class CameraService : ICameraService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.ZLogError($"初始化SDK时发生异常:{ex}");
+            _logger.ZLogError(ex, $"初始化SDK时发生异常");
             return false;
         }
     }
@@ -73,6 +81,7 @@ public class CameraService : ICameraService, IDisposable
 
             if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS && deviceList != null)
             {
+                _cachedDeviceList = deviceList; // 缓存设备列表
                 _logger.ZLogInformation($"找到 {deviceList.Length} 个相机设备");
                 for (int i = 0; i < deviceList.Length; i++)
                 {
@@ -105,64 +114,79 @@ public class CameraService : ICameraService, IDisposable
     }
 
     /// <summary>
-    /// 打开指定的相机
+    /// 打开指定的相机 - 使用CameraInit底层API（.NET 10兼容）
     /// </summary>
     public bool OpenCamera(int deviceIndex)
     {
         try
         {
+            _logger.ZLogInformation($"开始打开相机，设备索引: {deviceIndex}");
+
             if (_isOpened)
             {
                 _logger.ZLogWarning($"相机已经打开，请先关闭");
                 return false;
             }
 
-            tSdkCameraDevInfo[]? deviceList;
-            var status = MvApi.CameraEnumerateDevice(out deviceList);
+            if (_cachedDeviceList == null || _cachedDeviceList.Length == 0)
+            {
+                _logger.ZLogError($"设备列表为空，请先调用EnumerateDevices");
+                return false;
+            }
 
-            if (status != CameraSdkStatus.CAMERA_STATUS_SUCCESS || deviceList == null || deviceIndex >= deviceList.Length)
+            if (deviceIndex >= _cachedDeviceList.Length)
             {
                 _logger.ZLogError($"无效的设备索引: {deviceIndex}");
                 return false;
             }
 
-            _currentDeviceInfo = deviceList[deviceIndex];
-            status = MvApi.CameraInit(ref _currentDeviceInfo, -1, -1, ref _cameraHandle);
+            _currentDeviceInfo = _cachedDeviceList[deviceIndex];
+            _logger.ZLogInformation($"准备初始化相机: {Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0')}");
 
-            if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
+            // 使用CameraInit（CameraGrabber_Create在.NET 10下会卡死）
+            _logger.ZLogInformation($"调用CameraInit...");
+            CameraSdkStatus status = MvApi.CameraInit(ref _currentDeviceInfo, -1, -1, ref _cameraHandle);
+            _logger.ZLogInformation($"CameraInit返回: {status}, 句柄: {_cameraHandle}");
+            
+            if (status != CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
-                _logger.ZLogInformation($"相机打开成功，句柄: {_cameraHandle}");
-
-                // 获取相机能力描述
-                tSdkCameraCapbility capability;
-                MvApi.CameraGetCapability(_cameraHandle, out capability);
-
-                // 分配RGB缓冲区
-                int bufferSize = capability.sResolutionRange.iWidthMax * capability.sResolutionRange.iHeightMax * 3;
-                _frameBuffer = Marshal.AllocHGlobal(bufferSize);
-
-                _isOpened = true;
-                _currentCamera = new CameraInfo
-                {
-                    ProductSeries = Encoding.UTF8.GetString(_currentDeviceInfo.acProductSeries).TrimEnd('\0'),
-                    ProductName = Encoding.UTF8.GetString(_currentDeviceInfo.acProductName).TrimEnd('\0'),
-                    FriendlyName = Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0'),
-                    LinkName = Encoding.UTF8.GetString(_currentDeviceInfo.acLinkName).TrimEnd('\0'),
-                    DriverVersion = Encoding.UTF8.GetString(_currentDeviceInfo.acDriverVersion).TrimEnd('\0'),
-                    SensorType = Encoding.UTF8.GetString(_currentDeviceInfo.acSensorType).TrimEnd('\0'),
-                    PortType = Encoding.UTF8.GetString(_currentDeviceInfo.acPortType).TrimEnd('\0'),
-                    SerialNumber = Encoding.UTF8.GetString(_currentDeviceInfo.acSn).TrimEnd('\0'),
-                    Instance = _currentDeviceInfo.uInstance,
-                    DeviceIndex = deviceIndex
-                };
-
-                return true;
-            }
-            else
-            {
-                _logger.ZLogError($"相机打开失败: {status}");
+                _logger.ZLogError($"CameraInit失败: {status}");
                 return false;
             }
+
+            // 获取相机能力描述
+            tSdkCameraCapbility capability;
+            status = MvApi.CameraGetCapability(_cameraHandle, out capability);
+            if (status != CameraSdkStatus.CAMERA_STATUS_SUCCESS)
+            {
+                _logger.ZLogError($"获取相机能力失败: {status}");
+                MvApi.CameraUnInit(_cameraHandle);
+                _cameraHandle = -1;
+                return false;
+            }
+
+            // 分配RGB缓冲区
+            int bufferSize = capability.sResolutionRange.iWidthMax * capability.sResolutionRange.iHeightMax * 3;
+            _logger.ZLogInformation($"分配缓冲区大小: {bufferSize} 字节");
+            _frameBuffer = Marshal.AllocHGlobal(bufferSize);
+
+            _isOpened = true;
+            _currentCamera = new CameraInfo
+            {
+                ProductSeries = Encoding.UTF8.GetString(_currentDeviceInfo.acProductSeries).TrimEnd('\0'),
+                ProductName = Encoding.UTF8.GetString(_currentDeviceInfo.acProductName).TrimEnd('\0'),
+                FriendlyName = Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0'),
+                LinkName = Encoding.UTF8.GetString(_currentDeviceInfo.acLinkName).TrimEnd('\0'),
+                DriverVersion = Encoding.UTF8.GetString(_currentDeviceInfo.acDriverVersion).TrimEnd('\0'),
+                SensorType = Encoding.UTF8.GetString(_currentDeviceInfo.acSensorType).TrimEnd('\0'),
+                PortType = Encoding.UTF8.GetString(_currentDeviceInfo.acPortType).TrimEnd('\0'),
+                SerialNumber = Encoding.UTF8.GetString(_currentDeviceInfo.acSn).TrimEnd('\0'),
+                Instance = _currentDeviceInfo.uInstance,
+                DeviceIndex = deviceIndex
+            };
+
+            _logger.ZLogInformation($"相机打开完成");
+            return true;
         }
         catch (Exception ex)
         {
@@ -189,26 +213,59 @@ public class CameraService : ICameraService, IDisposable
                 StopCapture();
             }
 
-            var status = MvApi.CameraUnInit(_cameraHandle);
-            if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
+            if (_grabber != IntPtr.Zero)
             {
-                _logger.ZLogInformation($"相机关闭成功");
-                
-                if (_frameBuffer != IntPtr.Zero)
+                var status = MvApi.CameraGrabber_Destroy(_grabber);
+                if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
                 {
-                    Marshal.FreeHGlobal(_frameBuffer);
-                    _frameBuffer = IntPtr.Zero;
-                }
+                    _logger.ZLogInformation($"相机关闭成功");
+                    
+                    if (_frameBuffer != IntPtr.Zero)
+                    {
+                        Marshal.FreeHGlobal(_frameBuffer);
+                        _frameBuffer = IntPtr.Zero;
+                    }
 
-                _isOpened = false;
-                _currentCamera = null;
-                _cameraHandle = -1;
-                return true;
+                    _isOpened = false;
+                    _currentCamera = null;
+                    _cameraHandle = -1;
+                    _grabber = IntPtr.Zero;
+                    return true;
+                }
+                else
+                {
+                    _logger.ZLogError($"相机关闭失败: {status}");
+                    return false;
+                }
+            }
+            else if (_cameraHandle != -1)
+            {
+                var status = MvApi.CameraUnInit(_cameraHandle);
+                if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
+                {
+                    _logger.ZLogInformation($"相机关闭成功");
+                    
+                    if (_frameBuffer != IntPtr.Zero)
+                    {
+                        Marshal.FreeHGlobal(_frameBuffer);
+                        _frameBuffer = IntPtr.Zero;
+                    }
+
+                    _isOpened = false;
+                    _currentCamera = null;
+                    _cameraHandle = -1;
+                    return true;
+                }
+                else
+                {
+                    _logger.ZLogError($"相机关闭失败: {status}");
+                    return false;
+                }
             }
             else
             {
-                _logger.ZLogError($"相机关闭失败: {status}");
-                return false;
+                _logger.ZLogWarning($"相机未初始化");
+                return true;
             }
         }
         catch (Exception ex)
@@ -237,7 +294,18 @@ public class CameraService : ICameraService, IDisposable
                 return true;
             }
 
-            var status = MvApi.CameraPlay(_cameraHandle);
+            CameraSdkStatus status;
+            if (_grabber != IntPtr.Zero)
+            {
+                // 使用Grabber API
+                status = MvApi.CameraGrabber_StartLive(_grabber);
+            }
+            else
+            {
+                // 回退到基础API
+                status = MvApi.CameraPlay(_cameraHandle);
+            }
+
             if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
                 _logger.ZLogInformation($"开始采集图像");
@@ -276,7 +344,18 @@ public class CameraService : ICameraService, IDisposable
                 return true;
             }
 
-            var status = MvApi.CameraStop(_cameraHandle);
+            CameraSdkStatus status;
+            if (_grabber != IntPtr.Zero)
+            {
+                // 使用Grabber API
+                status = MvApi.CameraGrabber_StopLive(_grabber);
+            }
+            else
+            {
+                // 回退到基础API
+                status = MvApi.CameraStop(_cameraHandle);
+            }
+
             if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
                 _logger.ZLogInformation($"停止采集图像");

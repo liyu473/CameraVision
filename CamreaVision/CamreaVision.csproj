@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net10.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
@@ -11,6 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="iNKORE.UI.WPF.Modern" Version="0.10.2.1" />
 		<PackageReference Include="LyuExtensions" Version="1.1.7" />
 		<PackageReference Include="LyuLogExtension" Version="1.7.2" />
 		<PackageReference Include="LyuWpfHelper" Version="1.0.1" />
@@ -18,9 +19,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="MVSDK">
-	    <HintPath>DllSource\MVSDK.dll</HintPath>
-	  </Reference>
+		<Reference Include="MVSDK">
+			<HintPath>MVSDK.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>

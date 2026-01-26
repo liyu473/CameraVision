@@ -6,21 +6,30 @@
     xmlns:local="clr-namespace:CamreaVision.View"
     xmlns:lyu="http://schemas.lyuwpfhelper.com/winfx/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     xmlns:viewmodel="clr-namespace:CamreaVision.ViewModel"
     Title="MainWindow"
     Width="800"
     Height="450"
     d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+    ui:TitleBar.Height="36"
+    ui:WindowHelper.SystemBackdropType="Mica"
+    ui:WindowHelper.UseModernWindowStyle="True"
     mc:Ignorable="d">
     <Grid>
-        <TabControl>
-            <TabItem Header="MindVision">
-                <Grid RowDefinitions="Auto,*,2*">
+        <TabControl
+            ui:TabControlHelper.ContentBackground="Transparent"
+            ui:TabControlHelper.IsAddTabButtonVisible="False"
+            Style="{StaticResource TabControlPivotStyle}">
+            <TabItem ui:TabItemHelper.IsClosable="False" Header="MindVision">
+                <Grid lyu:GridHelper.RowDefinitions="Auto,*,2*">
                     <lyu:SimpleStackPanel
                         Grid.Row="0"
+                        Margin="10,8"
                         Orientation="Horizontal"
                         Spacing="24">
                         <Button Command="{Binding ScanCameraCommand}" Content="扫描相机" />
+                        <Button Command="{Binding OpenCameraCommand}" Content="打开相机" />
                     </lyu:SimpleStackPanel>
 
                     <DataGrid
@@ -28,10 +37,15 @@
                         lyu:DataGridRowNumberBehavior.HeaderText="序号"
                         lyu:DataGridRowNumberBehavior.IsEnabled="True"
                         AutoGenerateColumns="True"
+                        Background="Transparent"
                         CanUserAddRows="False"
                         CanUserSortColumns="False"
-                        ColumnWidth="*"
-                        ItemsSource="{Binding Cameras}">
+                        ColumnWidth="Auto"
+                        GridLinesVisibility="All"
+                        HeadersVisibility="Column"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding Cameras}"
+                        SelectedItem="{Binding SelectedCamera}">
                     </DataGrid>
                 </Grid>
             </TabItem>
