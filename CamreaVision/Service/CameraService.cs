@@ -114,7 +114,7 @@ public class CameraService : ICameraService, IDisposable
     }
 
     /// <summary>
-    /// 打开指定的相机 - 使用CameraInit底层API（.NET 10兼容）
+    /// 打开指定的相机（只支持net8.0）
     /// </summary>
     public bool OpenCamera(int deviceIndex)
     {
@@ -143,10 +143,8 @@ public class CameraService : ICameraService, IDisposable
             _currentDeviceInfo = _cachedDeviceList[deviceIndex];
             _logger.ZLogInformation($"准备初始化相机: {Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0')}");
 
-            // 使用CameraInit（CameraGrabber_Create在.NET 10下会卡死）
-            _logger.ZLogInformation($"调用CameraInit...");
             CameraSdkStatus status = MvApi.CameraInit(ref _currentDeviceInfo, -1, -1, ref _cameraHandle);
-            _logger.ZLogInformation($"CameraInit返回: {status}, 句柄: {_cameraHandle}");
+            _logger.ZLogDebug($"CameraInit返回: {status}, 句柄: {_cameraHandle}");
             
             if (status != CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {

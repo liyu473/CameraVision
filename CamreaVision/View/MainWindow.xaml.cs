@@ -8,9 +8,6 @@ namespace CamreaVision.View;
 /// </summary>
 public partial class MainWindow : Window
 {
-    /// <summary>
-    /// 构造函数 - 通过依赖注入获取ViewModel
-    /// </summary>
     public MainWindow(MainViewModel viewModel)
     {
         InitializeComponent();
