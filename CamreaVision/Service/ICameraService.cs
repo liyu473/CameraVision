@@ -104,6 +104,7 @@ public interface ICameraService
     /// <returns>是否成功</returns>
     bool SetTriggerMode(int mode);
 
+
     /// <summary>
     /// 保存图像到文件
     /// </summary>
@@ -132,4 +133,9 @@ public interface ICameraService
     /// 帧回调事件
     /// </summary>
     event EventHandler<CameraFrame>? FrameReceived;
+
+    /// <summary>
+    /// 打开自带的设置页面
+    /// </summary>
+    void OpenSettingPage();
 }

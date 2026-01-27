@@ -12,5 +12,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = viewModel;
+
+        Closed += (s, e) => viewModel.CloseCameraCommand.Execute(null);
     }
 }

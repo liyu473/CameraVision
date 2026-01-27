@@ -24,7 +24,7 @@ public class CameraService : ICameraService, IDisposable
     private bool _isCapturing = false;
     private CameraInfo? _currentCamera = null;
     private IntPtr _frameBuffer = IntPtr.Zero;
-    
+
     // 保存回调委托引用，防止被GC回收导致闪退
     private pfnCameraGrabberFrameCallback? _frameCallback;
 
@@ -39,6 +39,14 @@ public class CameraService : ICameraService, IDisposable
         _logger = logger;
     }
 
+    public void OpenSettingPage()
+    {
+        if (_isOpened && _cameraHandle != -1)
+        {
+            MvApi.CameraShowSettingPage(_cameraHandle, 1);
+        }
+    }
+
     /// <summary>
     /// 初始化SDK
     /// </summary>
@@ -46,10 +54,10 @@ public class CameraService : ICameraService, IDisposable
     {
         try
         {
-            _logger.ZLogInformation($"准备初始化SDK...");                   
+            _logger.ZLogInformation($"准备初始化SDK...");
             _logger.ZLogInformation($"准备调用CameraSdkInit...");
             var status = MvApi.CameraSdkInit(1);
-            
+
             if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
                 _logger.ZLogInformation($"相机SDK初始化成功");
@@ -86,19 +94,29 @@ public class CameraService : ICameraService, IDisposable
                 for (int i = 0; i < deviceList.Length; i++)
                 {
                     var device = deviceList[i];
-                    devices.Add(new CameraInfo
-                    {
-                        ProductSeries = Encoding.UTF8.GetString(device.acProductSeries).TrimEnd('\0'),
-                        ProductName = Encoding.UTF8.GetString(device.acProductName).TrimEnd('\0'),
-                        FriendlyName = Encoding.UTF8.GetString(device.acFriendlyName).TrimEnd('\0'),
-                        LinkName = Encoding.UTF8.GetString(device.acLinkName).TrimEnd('\0'),
-                        DriverVersion = Encoding.UTF8.GetString(device.acDriverVersion).TrimEnd('\0'),
-                        SensorType = Encoding.UTF8.GetString(device.acSensorType).TrimEnd('\0'),
-                        PortType = Encoding.UTF8.GetString(device.acPortType).TrimEnd('\0'),
-                        SerialNumber = Encoding.UTF8.GetString(device.acSn).TrimEnd('\0'),
-                        Instance = device.uInstance,
-                        DeviceIndex = i
-                    });
+                    devices.Add(
+                        new CameraInfo
+                        {
+                            ProductSeries = Encoding
+                                .UTF8.GetString(device.acProductSeries)
+                                .TrimEnd('\0'),
+                            ProductName = Encoding
+                                .UTF8.GetString(device.acProductName)
+                                .TrimEnd('\0'),
+                            FriendlyName = Encoding
+                                .UTF8.GetString(device.acFriendlyName)
+                                .TrimEnd('\0'),
+                            LinkName = Encoding.UTF8.GetString(device.acLinkName).TrimEnd('\0'),
+                            DriverVersion = Encoding
+                                .UTF8.GetString(device.acDriverVersion)
+                                .TrimEnd('\0'),
+                            SensorType = Encoding.UTF8.GetString(device.acSensorType).TrimEnd('\0'),
+                            PortType = Encoding.UTF8.GetString(device.acPortType).TrimEnd('\0'),
+                            SerialNumber = Encoding.UTF8.GetString(device.acSn).TrimEnd('\0'),
+                            Instance = device.uInstance,
+                            DeviceIndex = i,
+                        }
+                    );
                 }
             }
             else
@@ -141,11 +159,19 @@ public class CameraService : ICameraService, IDisposable
             }
 
             _currentDeviceInfo = _cachedDeviceList[deviceIndex];
-            _logger.ZLogInformation($"准备初始化相机: {Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0')}");
+            _logger.ZLogInformation(
+                $"准备初始化相机: {Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0')}"
+            );
 
-            CameraSdkStatus status = MvApi.CameraInit(ref _currentDeviceInfo, -1, -1, ref _cameraHandle);
+            CameraSdkStatus status = MvApi.CameraInit(
+                ref _currentDeviceInfo,
+                -1,
+                -1,
+                ref _cameraHandle
+            );
+
             _logger.ZLogDebug($"CameraInit返回: {status}, 句柄: {_cameraHandle}");
-            
+
             if (status != CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
                 _logger.ZLogError($"CameraInit失败: {status}");
@@ -164,24 +190,37 @@ public class CameraService : ICameraService, IDisposable
             }
 
             // 分配RGB缓冲区
-            int bufferSize = capability.sResolutionRange.iWidthMax * capability.sResolutionRange.iHeightMax * 3;
+            int bufferSize =
+                capability.sResolutionRange.iWidthMax * capability.sResolutionRange.iHeightMax * 3;
             _logger.ZLogInformation($"分配缓冲区大小: {bufferSize} 字节");
             _frameBuffer = Marshal.AllocHGlobal(bufferSize);
 
             _isOpened = true;
             _currentCamera = new CameraInfo
             {
-                ProductSeries = Encoding.UTF8.GetString(_currentDeviceInfo.acProductSeries).TrimEnd('\0'),
-                ProductName = Encoding.UTF8.GetString(_currentDeviceInfo.acProductName).TrimEnd('\0'),
-                FriendlyName = Encoding.UTF8.GetString(_currentDeviceInfo.acFriendlyName).TrimEnd('\0'),
+                ProductSeries = Encoding
+                    .UTF8.GetString(_currentDeviceInfo.acProductSeries)
+                    .TrimEnd('\0'),
+                ProductName = Encoding
+                    .UTF8.GetString(_currentDeviceInfo.acProductName)
+                    .TrimEnd('\0'),
+                FriendlyName = Encoding
+                    .UTF8.GetString(_currentDeviceInfo.acFriendlyName)
+                    .TrimEnd('\0'),
                 LinkName = Encoding.UTF8.GetString(_currentDeviceInfo.acLinkName).TrimEnd('\0'),
-                DriverVersion = Encoding.UTF8.GetString(_currentDeviceInfo.acDriverVersion).TrimEnd('\0'),
+                DriverVersion = Encoding
+                    .UTF8.GetString(_currentDeviceInfo.acDriverVersion)
+                    .TrimEnd('\0'),
                 SensorType = Encoding.UTF8.GetString(_currentDeviceInfo.acSensorType).TrimEnd('\0'),
                 PortType = Encoding.UTF8.GetString(_currentDeviceInfo.acPortType).TrimEnd('\0'),
                 SerialNumber = Encoding.UTF8.GetString(_currentDeviceInfo.acSn).TrimEnd('\0'),
                 Instance = _currentDeviceInfo.uInstance,
-                DeviceIndex = deviceIndex
+                DeviceIndex = deviceIndex,
             };
+
+            // 创建设置页面
+            MvApi.CameraCreateSettingPage(_cameraHandle, IntPtr.Zero, 
+                _currentDeviceInfo.acFriendlyName, null, IntPtr.Zero, 0);
 
             _logger.ZLogInformation($"相机打开完成");
             return true;
@@ -217,7 +256,7 @@ public class CameraService : ICameraService, IDisposable
                 if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
                 {
                     _logger.ZLogInformation($"相机关闭成功");
-                    
+
                     if (_frameBuffer != IntPtr.Zero)
                     {
                         Marshal.FreeHGlobal(_frameBuffer);
@@ -242,7 +281,7 @@ public class CameraService : ICameraService, IDisposable
                 if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
                 {
                     _logger.ZLogInformation($"相机关闭成功");
-                    
+
                     if (_frameBuffer != IntPtr.Zero)
                     {
                         Marshal.FreeHGlobal(_frameBuffer);
@@ -388,7 +427,12 @@ public class CameraService : ICameraService, IDisposable
 
             IntPtr pFrameBuffer;
             tSdkFrameHead frameHead;
-            var status = MvApi.CameraGetImageBuffer(_cameraHandle, out frameHead, out pFrameBuffer, (uint)timeout);
+            var status = MvApi.CameraGetImageBuffer(
+                _cameraHandle,
+                out frameHead,
+                out pFrameBuffer,
+                (uint)timeout
+            );
 
             if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
             {
@@ -412,7 +456,11 @@ public class CameraService : ICameraService, IDisposable
                     AnalogGain = (uint)frameHead.fAnalogGain,
                     CaptureTime = DateTime.Now,
                     // 创建BitmapSource用于WPF显示
-                    BitmapSource = CreateBitmapSource(imageData, frameHead.iWidth, frameHead.iHeight)
+                    BitmapSource = CreateBitmapSource(
+                        imageData,
+                        frameHead.iWidth,
+                        frameHead.iHeight
+                    ),
                 };
 
                 // 释放缓冲区
@@ -425,7 +473,7 @@ public class CameraService : ICameraService, IDisposable
             }
             else if (status == CameraSdkStatus.CAMERA_STATUS_TIME_OUT)
             {
-                _logger.ZLogDebug($"获取图像超时");
+                //_logger.ZLogDebug($"获取图像超时");
                 return null;
             }
             else
@@ -620,7 +668,7 @@ public class CameraService : ICameraService, IDisposable
                 iWidth = width,
                 iHeight = height,
                 iWidthFOV = width,
-                iHeightFOV = height
+                iHeightFOV = height,
             };
 
             var status = MvApi.CameraSetImageResolution(_cameraHandle, ref resolution);
@@ -668,7 +716,7 @@ public class CameraService : ICameraService, IDisposable
                     HorizontalOffset = resolution.iHOffsetFOV,
                     VerticalOffset = resolution.iVOffsetFOV,
                     WidthFOV = resolution.iWidthFOV,
-                    HeightFOV = resolution.iHeightFOV
+                    HeightFOV = resolution.iHeightFOV,
                 };
             }
             else
@@ -715,6 +763,7 @@ public class CameraService : ICameraService, IDisposable
             return false;
         }
     }
+    
 
     /// <summary>
     /// 保存图像到文件
@@ -735,18 +784,39 @@ public class CameraService : ICameraService, IDisposable
 
             CameraSdkStatus status;
             tSdkFrameHead frameHead = CreateFrameHead(frame);
-            
+
             if (extension == ".bmp")
             {
-                status = MvApi.CameraSaveImage(_cameraHandle, filePath, imageBuffer, ref frameHead, emSdkFileType.FILE_BMP, (byte)quality);
+                status = MvApi.CameraSaveImage(
+                    _cameraHandle,
+                    filePath,
+                    imageBuffer,
+                    ref frameHead,
+                    emSdkFileType.FILE_BMP,
+                    (byte)quality
+                );
             }
             else if (extension == ".jpg" || extension == ".jpeg")
             {
-                status = MvApi.CameraSaveImage(_cameraHandle, filePath, imageBuffer, ref frameHead, emSdkFileType.FILE_JPG, (byte)quality);
+                status = MvApi.CameraSaveImage(
+                    _cameraHandle,
+                    filePath,
+                    imageBuffer,
+                    ref frameHead,
+                    emSdkFileType.FILE_JPG,
+                    (byte)quality
+                );
             }
             else if (extension == ".png")
             {
-                status = MvApi.CameraSaveImage(_cameraHandle, filePath, imageBuffer, ref frameHead, emSdkFileType.FILE_PNG, (byte)quality);
+                status = MvApi.CameraSaveImage(
+                    _cameraHandle,
+                    filePath,
+                    imageBuffer,
+                    ref frameHead,
+                    emSdkFileType.FILE_PNG,
+                    (byte)quality
+                );
             }
             else
             {
@@ -790,7 +860,8 @@ public class CameraService : ICameraService, IDisposable
                 PixelFormats.Bgr24,
                 null,
                 imageData,
-                width * 3);
+                width * 3
+            );
 
             bitmap.Freeze();
             return bitmap;
@@ -813,7 +884,7 @@ public class CameraService : ICameraService, IDisposable
             iHeight = frame.Height,
             uiMediaType = frame.MediaType,
             uiTimeStamp = frame.TimeStamp,
-            uiExpTime = frame.ExposureTime
+            uiExpTime = frame.ExposureTime,
         };
     }
 

@@ -10,7 +10,7 @@ public class CameraFrame
     /// <summary>
     /// 图像数据
     /// </summary>
-    public byte[] ImageData { get; set; } = Array.Empty<byte>();
+    public byte[] ImageData { get; set; } = [];
 
     /// <summary>
     /// 图像宽度

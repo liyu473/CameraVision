@@ -15,6 +15,7 @@
     ui:TitleBar.Height="36"
     ui:WindowHelper.SystemBackdropType="Mica"
     ui:WindowHelper.UseModernWindowStyle="True"
+    WindowState="Maximized"
     mc:Ignorable="d">
     <Grid>
         <TabControl
@@ -22,7 +23,7 @@
             ui:TabControlHelper.IsAddTabButtonVisible="False"
             Style="{StaticResource TabControlPivotStyle}">
             <TabItem ui:TabItemHelper.IsClosable="False" Header="MindVision">
-                <Grid lyu:GridHelper.RowDefinitions="Auto,Auto,*" lyu:GridHelper.ColumnDefinitions="*,*">
+                <Grid lyu:GridHelper.ColumnDefinitions="*,*" lyu:GridHelper.RowDefinitions="Auto,Auto,*,Auto">
                     <lyu:SimpleStackPanel
                         Grid.Row="0"
                         Grid.ColumnSpan="2"
@@ -33,6 +34,8 @@
                         <Button Command="{Binding OpenCameraCommand}" Content="打开相机" />
                         <Button Command="{Binding CloseCameraCommand}" Content="关闭相机" />
                         <Button Command="{Binding CaptureCommand}" Content="捕捉图像" />
+
+                        <Button Command="{Binding OpenSettingCommand}" Content="设置" />
                     </lyu:SimpleStackPanel>
 
                     <DataGrid
@@ -83,6 +86,13 @@
                             <Image Source="{Binding CapturedImage}" Stretch="Uniform" />
                         </Grid>
                     </Border>
+
+                    <lyu:SimpleStackPanel Grid.Row="3" Orientation="Horizontal">
+                        <ui:ToggleSwitch
+                            IsOn="{Binding IsPreview}"
+                            OffContent="关闭采集"
+                            OnContent="开启采集" />
+                    </lyu:SimpleStackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

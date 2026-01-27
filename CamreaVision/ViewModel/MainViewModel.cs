@@ -1,12 +1,13 @@
-﻿using CamreaVision.Models;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using CamreaVision.Models;
 using CamreaVision.Service;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LyuWpfHelper.ViewModels;
 using Microsoft.Extensions.Logging;
-using System.Collections.ObjectModel;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using ZLogger;
 
 namespace CamreaVision.ViewModel;
 
@@ -32,13 +33,40 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CloseCameraCommand))]
     [NotifyCanExecuteChangedFor(nameof(CaptureCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenSettingCommand))]
     public partial bool IsCameraOpened { get; set; }
+
+    partial void OnIsCameraOpenedChanged(bool value)
+    {
+        if (!value)
+        {
+            IsPreview = false;
+        }
+    }
 
     [ObservableProperty]
     public partial BitmapSource? PreviewImage { get; set; }
 
     [ObservableProperty]
     public partial BitmapSource? CapturedImage { get; set; }
+
+    /// <summary>
+    /// 是否开启采集
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsPreview { get; set; }
+
+    partial void OnIsPreviewChanged(bool value)
+    {
+        if (value)
+        {
+            StartPreview();
+        }
+        else
+        {
+            StopPreview();
+        }
+    }
 
     public MainViewModel(ICameraService cameraService, ILogger<MainViewModel> logger)
     {
@@ -49,6 +77,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     #region MindVision
+
+    [RelayCommand(CanExecute = (nameof(IsCameraOpened)))]
+    private void OpenSetting()
+    {
+        _cameraService.OpenSettingPage();
+    }
 
     [RelayCommand(CanExecute = (nameof(IsInitialSDK)))]
     private void ScanCamera()
@@ -64,7 +98,7 @@ public partial class MainViewModel : ViewModelBase
         {
             _cameraService.StartCapture();
             IsCameraOpened = true;
-            StartPreview();
+            IsPreview = true;
         }
     }
 
@@ -81,10 +115,12 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand(CanExecute = (nameof(IsCameraOpened)))]
     private void Capture()
     {
+        _logger.ZLogInformation($"开始捕捉图像");
         var frame = _cameraService.GetFrame(500);
         if (frame?.BitmapSource != null)
         {
             CapturedImage = frame.BitmapSource;
+            _logger.ZLogInformation($"捕捉图像完成");
         }
     }
 
@@ -92,7 +128,7 @@ public partial class MainViewModel : ViewModelBase
     {
         _previewTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(33) // ~30fps
+            Interval = TimeSpan.FromMilliseconds(33), // ~30fps
         };
         _previewTimer.Tick += (s, e) =>
         {
