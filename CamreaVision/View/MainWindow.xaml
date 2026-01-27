@@ -89,6 +89,10 @@
 
                     <lyu:SimpleStackPanel Grid.Row="3" Orientation="Horizontal">
                         <ui:ToggleSwitch
+                            IsOn="{Binding IsColor}"
+                            OffContent="彩色"
+                            OnContent="黑白" />
+                        <ui:ToggleSwitch
                             IsOn="{Binding IsPreview}"
                             OffContent="关闭采集"
                             OnContent="开启采集" />

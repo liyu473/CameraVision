@@ -219,8 +219,14 @@ public class CameraService : ICameraService, IDisposable
             };
 
             // 创建设置页面
-            MvApi.CameraCreateSettingPage(_cameraHandle, IntPtr.Zero, 
-                _currentDeviceInfo.acFriendlyName, null, IntPtr.Zero, 0);
+            MvApi.CameraCreateSettingPage(
+                _cameraHandle,
+                IntPtr.Zero,
+                _currentDeviceInfo.acFriendlyName,
+                null,
+                IntPtr.Zero,
+                0
+            );
 
             _logger.ZLogInformation($"相机打开完成");
             return true;
@@ -763,7 +769,39 @@ public class CameraService : ICameraService, IDisposable
             return false;
         }
     }
-    
+
+    /// <summary>
+    /// 设置彩色/灰度模式
+    /// </summary>
+    public bool SetColorMode(bool isColor)
+    {
+        try
+        {
+            if (!_isOpened)
+            {
+                return false;
+            }
+
+            // isColor=false 表示彩色，不启用黑白转换
+            // isColor=true 表示灰度，启用黑白转换
+            var status = MvApi.CameraSetMonochrome(_cameraHandle, (uint)(isColor ? 1 : 0));
+            if (status == CameraSdkStatus.CAMERA_STATUS_SUCCESS)
+            {
+                _logger.ZLogInformation($"设置{(!isColor ? "彩色" : "灰度")}模式成功");
+                return true;
+            }
+            else
+            {
+                _logger.ZLogError($"设置色彩模式失败: {status}");
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.ZLogError(ex, $"设置彩色模式时发生异常");
+            return false;
+        }
+    }
 
     /// <summary>
     /// 保存图像到文件

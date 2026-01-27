@@ -56,6 +56,17 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     public partial bool IsPreview { get; set; }
 
+    /// <summary>
+    /// 彩色/黑白
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsColor { get; set; } = false;
+
+    partial void OnIsColorChanged(bool value)
+    {
+        _cameraService.SetColorMode(value);
+    }
+
     partial void OnIsPreviewChanged(bool value)
     {
         if (value)

@@ -138,4 +138,12 @@ public interface ICameraService
     /// 打开自带的设置页面
     /// </summary>
     void OpenSettingPage();
+
+
+    /// <summary>
+    /// 彩色/黑白模式切换
+    /// </summary>
+    /// <param name="isColor"></param>
+    /// <returns></returns>
+    bool SetColorMode(bool isColor);
 }
