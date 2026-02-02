@@ -13,16 +13,16 @@ namespace CamreaVision.Service;
 /// <summary>
 /// 相机服务实现类
 /// </summary>
-public class CameraService : ICameraService, IDisposable
+public class MindCameraService : IMindCameraService, IDisposable
 {
-    private readonly ILogger<CameraService> _logger;
+    private readonly ILogger<MindCameraService> _logger;
     private int _cameraHandle = -1;
     private IntPtr _grabber = IntPtr.Zero;
     private tSdkCameraDevInfo _currentDeviceInfo;
     private tSdkCameraDevInfo[]? _cachedDeviceList = null;
     private bool _isOpened = false;
     private bool _isCapturing = false;
-    private CameraInfo? _currentCamera = null;
+    private MindCameraInfo? _currentCamera = null;
     private IntPtr _frameBuffer = IntPtr.Zero;
 
     // 保存回调委托引用，防止被GC回收导致闪退
@@ -30,11 +30,11 @@ public class CameraService : ICameraService, IDisposable
 
     public bool IsOpened => _isOpened;
     public bool IsCapturing => _isCapturing;
-    public CameraInfo? CurrentCamera => _currentCamera;
+    public MindCameraInfo? CurrentCamera => _currentCamera;
 
     public event EventHandler<CameraFrame>? FrameReceived;
 
-    public CameraService(ILogger<CameraService> logger)
+    public MindCameraService(ILogger<MindCameraService> logger)
     {
         _logger = logger;
     }
@@ -79,9 +79,9 @@ public class CameraService : ICameraService, IDisposable
     /// <summary>
     /// 枚举所有可用的相机设备
     /// </summary>
-    public List<CameraInfo> EnumerateDevices()
+    public List<MindCameraInfo> EnumerateDevices()
     {
-        var devices = new List<CameraInfo>();
+        var devices = new List<MindCameraInfo>();
         try
         {
             tSdkCameraDevInfo[]? deviceList;
@@ -95,7 +95,7 @@ public class CameraService : ICameraService, IDisposable
                 {
                     var device = deviceList[i];
                     devices.Add(
-                        new CameraInfo
+                        new MindCameraInfo
                         {
                             ProductSeries = Encoding
                                 .UTF8.GetString(device.acProductSeries)
@@ -196,7 +196,7 @@ public class CameraService : ICameraService, IDisposable
             _frameBuffer = Marshal.AllocHGlobal(bufferSize);
 
             _isOpened = true;
-            _currentCamera = new CameraInfo
+            _currentCamera = new MindCameraInfo
             {
                 ProductSeries = Encoding
                     .UTF8.GetString(_currentDeviceInfo.acProductSeries)

@@ -1,0 +1,33 @@
+﻿<UserControl
+    x:Class="CamreaVision.View.HIK_MvCu060_View"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="clr-namespace:CamreaVision.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:CamreaVision.View"
+    xmlns:lyu="http://schemas.lyuwpfhelper.com/winfx/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    xmlns:viewmodel="clr-namespace:CamreaVision.ViewModel"
+    d:DataContext="{d:DesignInstance Type=viewmodel:HIK_MvCu060_ViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:DeviceInfoToDisplayNameConverter x:Key="DeviceInfoToDisplayNameConverter" />
+    </UserControl.Resources>
+    <Grid Margin="20,12" lyu:GridHelper.RowDefinitions="Auto,*">
+        <lyu:SimpleStackPanel Orientation="Horizontal" Spacing="16">
+            <TextBlock VerticalAlignment="Center" Style="{StaticResource {x:Static ui:ThemeKeys.BodyTextBlockStyleKey}}">选择相机设备：</TextBlock>
+            <ComboBox ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ., Converter={StaticResource DeviceInfoToDisplayNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <Button Command="{Binding ScanDevicesCommand}" Content="ScanDevices" />
+        </lyu:SimpleStackPanel>
+    </Grid>
+</UserControl>

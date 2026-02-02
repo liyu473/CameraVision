@@ -22,6 +22,9 @@
 		<Reference Include="MVSDK">
 			<HintPath>MVSDK.dll</HintPath>
 		</Reference>
+		<Reference Include="MvCameraControl.Net">
+			<HintPath>MvCameraControl.Net.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>

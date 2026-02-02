@@ -3,7 +3,7 @@ namespace CamreaVision.Models;
 /// <summary>
 /// 相机设备信息
 /// </summary>
-public class CameraInfo
+public class MindCameraInfo
 {
     /// <summary>
     /// 产品系列

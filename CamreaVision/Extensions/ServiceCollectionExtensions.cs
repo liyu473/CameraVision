@@ -1,3 +1,4 @@
+using CamreaVision.Models;
 using CamreaVision.Service;
 using CamreaVision.View;
 using CamreaVision.ViewModel;
@@ -19,7 +20,12 @@ public static class ServiceCollectionExtensions
         services.AddZLogger();
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainViewModel>();
-        services.AddSingleton<ICameraService, CameraService>();
+        services.AddSingleton<IMindCameraService, MindCameraService>();
+        services.AddSingleton<HIK_MvCu060_CameraService>();
+        services.AddSingleton<HIK_MvCu060_View>();
+        services.AddSingleton<HIK_MvCu060_ViewModel>();
+        services.AddSingleton<MindVisionView>();
+        services.AddSingleton<MindVisionViewModel>();
 
         return services;
     }

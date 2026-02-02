@@ -1,5 +1,6 @@
-using CamreaVision.ViewModel;
 using System.Windows;
+using CamreaVision.Service;
+using CamreaVision.ViewModel;
 
 namespace CamreaVision.View;
 
@@ -8,11 +9,17 @@ namespace CamreaVision.View;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow(MainViewModel viewModel)
+    private readonly MainViewModel _vm;
+    public MainWindow(IMindCameraService mindservice,HIK_MvCu060_CameraService hikservice,MainViewModel vm)
     {
         InitializeComponent();
-        DataContext = viewModel;
+        DataContext = vm;
+        _vm = vm;
 
-        Closed += (s, e) => viewModel.CloseCameraCommand.Execute(null);
+        Closed += (s, e) =>
+        {
+            mindservice.CloseCamera();
+            hikservice.FinalizeSDK();
+        };
     }
 }

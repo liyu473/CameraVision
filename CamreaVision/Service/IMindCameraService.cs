@@ -5,7 +5,7 @@ namespace CamreaVision.Service;
 /// <summary>
 /// 相机服务接口
 /// </summary>
-public interface ICameraService
+public interface IMindCameraService
 {
     /// <summary>
     /// 初始化SDK
@@ -17,7 +17,7 @@ public interface ICameraService
     /// 枚举所有可用的相机设备
     /// </summary>
     /// <returns>相机设备列表</returns>
-    List<CameraInfo> EnumerateDevices();
+    List<MindCameraInfo> EnumerateDevices();
 
     /// <summary>
     /// 打开指定的相机
@@ -127,7 +127,7 @@ public interface ICameraService
     /// <summary>
     /// 当前打开的相机信息
     /// </summary>
-    CameraInfo? CurrentCamera { get; }
+    MindCameraInfo? CurrentCamera { get; }
 
     /// <summary>
     /// 帧回调事件

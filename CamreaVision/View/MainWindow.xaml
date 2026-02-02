@@ -17,88 +17,19 @@
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowState="Maximized"
     mc:Ignorable="d">
-    <Grid>
+    <Grid lyu:GridHelper.RowDefinitions="Auto,*">
         <TabControl
+            Grid.Row="0"
             ui:TabControlHelper.ContentBackground="Transparent"
             ui:TabControlHelper.IsAddTabButtonVisible="False"
+            SelectedIndex="{Binding SelectedPageIndex}"
             Style="{StaticResource TabControlPivotStyle}">
-            <TabItem ui:TabItemHelper.IsClosable="False" Header="MindVision">
-                <Grid lyu:GridHelper.ColumnDefinitions="*,*" lyu:GridHelper.RowDefinitions="Auto,Auto,*,Auto">
-                    <lyu:SimpleStackPanel
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        Margin="10,8"
-                        Orientation="Horizontal"
-                        Spacing="12">
-                        <Button Command="{Binding ScanCameraCommand}" Content="扫描相机" />
-                        <Button Command="{Binding OpenCameraCommand}" Content="打开相机" />
-                        <Button Command="{Binding CloseCameraCommand}" Content="关闭相机" />
-                        <Button Command="{Binding CaptureCommand}" Content="捕捉图像" />
-
-                        <Button Command="{Binding OpenSettingCommand}" Content="设置" />
-                    </lyu:SimpleStackPanel>
-
-                    <DataGrid
-                        Grid.Row="1"
-                        Grid.ColumnSpan="2"
-                        MaxHeight="150"
-                        lyu:DataGridRowNumberBehavior.HeaderText="序号"
-                        lyu:DataGridRowNumberBehavior.IsEnabled="True"
-                        AutoGenerateColumns="True"
-                        Background="Transparent"
-                        CanUserAddRows="False"
-                        CanUserSortColumns="False"
-                        ColumnWidth="Auto"
-                        GridLinesVisibility="All"
-                        HeadersVisibility="Column"
-                        IsReadOnly="True"
-                        ItemsSource="{Binding Cameras}"
-                        SelectedItem="{Binding SelectedCamera}" />
-
-                    <Border
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Margin="5"
-                        BorderBrush="Gray"
-                        BorderThickness="1">
-                        <Grid>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="Gray"
-                                Text="实时预览" />
-                            <Image Source="{Binding PreviewImage}" Stretch="Uniform" />
-                        </Grid>
-                    </Border>
-
-                    <Border
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="5"
-                        BorderBrush="Gray"
-                        BorderThickness="1">
-                        <Grid>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="Gray"
-                                Text="捕捉图像" />
-                            <Image Source="{Binding CapturedImage}" Stretch="Uniform" />
-                        </Grid>
-                    </Border>
-
-                    <lyu:SimpleStackPanel Grid.Row="3" Orientation="Horizontal">
-                        <ui:ToggleSwitch
-                            IsOn="{Binding IsColor}"
-                            OffContent="彩色"
-                            OnContent="黑白" />
-                        <ui:ToggleSwitch
-                            IsOn="{Binding IsPreview}"
-                            OffContent="关闭采集"
-                            OnContent="开启采集" />
-                    </lyu:SimpleStackPanel>
-                </Grid>
-            </TabItem>
+            <TabItem Header="MindVision" />
+            <TabItem Header="HIK-MVCU060" />
         </TabControl>
+        <ui:TransitioningContentControl
+            Grid.Row="1"
+            Content="{Binding Content}"
+            Transition="LeftReplace" />
     </Grid>
 </Window>
