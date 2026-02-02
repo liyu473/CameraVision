@@ -19,6 +19,9 @@ public partial class MainWindow : Window
         Closed += (s, e) =>
         {
             mindservice.CloseCamera();
+
+            hikservice.CloseCamera();
+            hikservice.DisposeCamera();
             hikservice.FinalizeSDK();
         };
     }

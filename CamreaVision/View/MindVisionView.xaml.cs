@@ -1,28 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using CamreaVision.ViewModel;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace CamreaVision.View
+namespace CamreaVision.View;
+
+/// <summary>
+/// MindVisionView.xaml 的交互逻辑
+/// </summary>
+public partial class MindVisionView : UserControl
 {
-    /// <summary>
-    /// MindVisionView.xaml 的交互逻辑
-    /// </summary>
-    public partial class MindVisionView : UserControl
+    private readonly MindVisionViewModel _vm;
+    public MindVisionView(MindVisionViewModel vm)
     {
-        public MindVisionView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        DataContext = vm;
+        _vm = vm;
     }
 }
