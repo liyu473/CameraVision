@@ -1,16 +1,15 @@
-using System.Windows;
 using CamreaVision.Extensions;
 using CamreaVision.Handlers;
 using CamreaVision.View;
-using LyuLogExtension.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace CamreaVision;
 
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     /// <summary>
     /// 依赖注入服务提供者
@@ -40,7 +39,7 @@ public partial class App : Application
     /// </summary>
     private void ConfigureServices(IServiceCollection services)
     {
-        services.AddApplicationServices();      
+        services.AddApplicationServices();
     }
 
     /// <summary>

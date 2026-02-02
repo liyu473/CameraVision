@@ -19,7 +19,7 @@ public static class GlobalExceptionHandler
     public static void Initialize()
     {
         // 捕获UI线程未处理的异常
-        Application.Current.DispatcherUnhandledException += OnDispatcherUnhandledException;
+        System.Windows.Application.Current.DispatcherUnhandledException += OnDispatcherUnhandledException;
 
         // 捕获非UI线程未处理的异常
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
@@ -42,7 +42,7 @@ public static class GlobalExceptionHandler
         {
             try
             {
-                MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -50,7 +50,7 @@ public static class GlobalExceptionHandler
             }
         }
 
-        var dispatcher = Application.Current?.Dispatcher;
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
         if (dispatcher == null || dispatcher.HasShutdownStarted)
         {
             Interlocked.Exchange(ref _dialogShowing, 0);

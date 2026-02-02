@@ -1,18 +1,20 @@
-﻿using CamreaVision.ViewModel;
-using System.Windows.Controls;
+using CamreaVision.ViewModel;
 
 namespace CamreaVision.View;
 
 /// <summary>
-/// HIK_MvCu060_View.xaml 的交互逻辑
+/// 海康相机视图的交互逻辑
 /// </summary>
-public partial class HIK_MvCu060_View : UserControl
+public partial class HIK_MvCu060_View : System.Windows.Controls.UserControl
 {
-    private readonly HIK_MvCu060_ViewModel _vm;
+    /// <summary>
+    /// 构造函数，初始化视图并绑定数据上下文
+    /// </summary>
+    /// <param name="vm">视图模型实例</param>
     public HIK_MvCu060_View(HIK_MvCu060_ViewModel vm)
     {
         InitializeComponent();
         DataContext = vm;
-        _vm = vm;
     }
 }
+
