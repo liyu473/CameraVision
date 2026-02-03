@@ -136,6 +136,61 @@ public partial class HIK_MvCu060_ViewModel : ViewModelBase, IDisposable
 
     #endregion
 
+    #region 参数验证
+
+    /// <summary>
+    /// 曝光时间改变时的验证
+    /// </summary>
+    partial void OnExposureTimeChanged(float value)
+    {
+        if (value < ExposureTimeMin)
+        {
+            ExposureTime = ExposureTimeMin;
+            StatusText = $"曝光时间不能小于 {ExposureTimeMin} μs，已自动修正";
+        }
+        else if (value > ExposureTimeMax)
+        {
+            ExposureTime = ExposureTimeMax;
+            StatusText = $"曝光时间不能大于 {ExposureTimeMax} μs，已自动修正";
+        }
+    }
+
+    /// <summary>
+    /// 增益改变时的验证
+    /// </summary>
+    partial void OnGainChanged(float value)
+    {
+        if (value < GainMin)
+        {
+            Gain = GainMin;
+            StatusText = $"增益不能小于 {GainMin} dB，已自动修正";
+        }
+        else if (value > GainMax)
+        {
+            Gain = GainMax;
+            StatusText = $"增益不能大于 {GainMax} dB，已自动修正";
+        }
+    }
+
+    /// <summary>
+    /// 帧率改变时的验证
+    /// </summary>
+    partial void OnFrameRateChanged(float value)
+    {
+        if (value < FrameRateMin)
+        {
+            FrameRate = FrameRateMin;
+            StatusText = $"帧率不能小于 {FrameRateMin} fps，已自动修正";
+        }
+        else if (value > FrameRateMax)
+        {
+            FrameRate = FrameRateMax;
+            StatusText = $"帧率不能大于 {FrameRateMax} fps，已自动修正";
+        }
+    }
+
+    #endregion
+
     #region 可观察属性 - 状态标志
 
     /// <summary>

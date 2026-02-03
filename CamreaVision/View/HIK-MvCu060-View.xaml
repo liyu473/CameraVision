@@ -125,93 +125,54 @@
             Grid.Row="3"
             Margin="0,4"
             Header="相机参数设置">
-            <Grid Margin="8" lyu:GridHelper.ColumnDefinitions="Auto,*,Auto,Auto,*,Auto,Auto,*,Auto,Auto,Auto">
+            <Grid Margin="8" lyu:GridHelper.ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
 
                 <!--  曝光时间  -->
                 <TextBlock
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Text="曝光时间(μs)：" />
-                <Slider
+                <TextBox
                     Grid.Column="1"
-                    MinWidth="120"
+                    Width="100"
                     VerticalAlignment="Center"
                     IsEnabled="{Binding IsCameraOpened}"
-                    LargeChange="1000"
-                    Maximum="{Binding ExposureTimeMax}"
-                    Minimum="{Binding ExposureTimeMin}"
-                    SmallChange="100"
-                    Value="{Binding ExposureTime}" />
-                <ui:NumberBox
-                    Grid.Column="2"
-                    Width="100"
-                    Margin="4,0"
-                    IsEnabled="{Binding IsCameraOpened}"
-                    Maximum="{Binding ExposureTimeMax}"
-                    Minimum="{Binding ExposureTimeMin}"
-                    SpinButtonPlacementMode="Compact"
-                    Value="{Binding ExposureTime, Mode=TwoWay}" />
+                    Text="{Binding ExposureTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!--  增益  -->
                 <TextBlock
-                    Grid.Column="3"
+                    Grid.Column="2"
                     Margin="16,0,0,0"
                     VerticalAlignment="Center"
                     Text="增益(dB)：" />
-                <Slider
-                    Grid.Column="4"
-                    MinWidth="100"
+                <TextBox
+                    Grid.Column="3"
+                    Width="80"
                     VerticalAlignment="Center"
                     IsEnabled="{Binding IsCameraOpened}"
-                    LargeChange="1"
-                    Maximum="{Binding GainMax}"
-                    Minimum="{Binding GainMin}"
-                    SmallChange="0.1"
-                    Value="{Binding Gain}" />
-                <ui:NumberBox
-                    Grid.Column="5"
-                    Width="80"
-                    Margin="4,0"
-                    IsEnabled="{Binding IsCameraOpened}"
-                    Maximum="{Binding GainMax}"
-                    Minimum="{Binding GainMin}"
-                    SpinButtonPlacementMode="Compact"
-                    Value="{Binding Gain, Mode=TwoWay}" />
+                    Text="{Binding Gain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!--  帧率  -->
                 <TextBlock
-                    Grid.Column="6"
+                    Grid.Column="4"
                     Margin="16,0,0,0"
                     VerticalAlignment="Center"
                     Text="帧率(fps)：" />
-                <Slider
-                    Grid.Column="7"
-                    MinWidth="100"
+                <TextBox
+                    Grid.Column="5"
+                    Width="80"
                     VerticalAlignment="Center"
                     IsEnabled="{Binding IsCameraOpened}"
-                    LargeChange="5"
-                    Maximum="{Binding FrameRateMax}"
-                    Minimum="{Binding FrameRateMin}"
-                    SmallChange="1"
-                    Value="{Binding FrameRate}" />
-                <ui:NumberBox
-                    Grid.Column="8"
-                    Width="80"
-                    Margin="4,0"
-                    IsEnabled="{Binding IsCameraOpened}"
-                    Maximum="{Binding FrameRateMax}"
-                    Minimum="{Binding FrameRateMin}"
-                    SpinButtonPlacementMode="Compact"
-                    Value="{Binding FrameRate, Mode=TwoWay}" />
+                    Text="{Binding FrameRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!--  参数操作按钮  -->
                 <Button
-                    Grid.Column="9"
+                    Grid.Column="6"
                     Margin="16,0,4,0"
                     Command="{Binding GetParametersCommand}"
                     Content="获取参数" />
                 <Button
-                    Grid.Column="10"
+                    Grid.Column="7"
                     Command="{Binding SetParametersCommand}"
                     Content="应用参数" />
             </Grid>
