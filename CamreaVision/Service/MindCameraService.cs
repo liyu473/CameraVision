@@ -11,7 +11,7 @@ using ZLogger;
 namespace CamreaVision.Service;
 
 /// <summary>
-/// 相机服务实现类
+/// 迈德威视相机服务实现类
 /// </summary>
 public class MindCameraService : IMindCameraService, IDisposable
 {

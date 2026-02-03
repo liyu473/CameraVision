@@ -9,7 +9,7 @@ namespace CamreaVision;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : System.Windows.Application
+public partial class App : Application
 {
     /// <summary>
     /// 依赖注入服务提供者

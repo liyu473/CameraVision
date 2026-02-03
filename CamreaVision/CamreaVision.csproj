@@ -16,6 +16,8 @@
 		<PackageReference Include="LyuLogExtension" Version="1.7.2" />
 		<PackageReference Include="LyuWpfHelper" Version="1.0.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+		<PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
+		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
 		<PackageReference Include="System.Drawing.Common" Version="10.0.2" />
 	</ItemGroup>
 

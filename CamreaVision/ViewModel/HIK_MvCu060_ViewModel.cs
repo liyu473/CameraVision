@@ -220,6 +220,7 @@ public partial class HIK_MvCu060_ViewModel : ViewModelBase, IDisposable
             Devices = new ObservableCollection<IDeviceInfo>(deviceList);
             SelectedDevice = Devices.FirstOrDefault();
             StatusText = $"扫描到 {Devices.Count} 个设备";
+            OpenCameraCommand.NotifyCanExecuteChanged();
             _logger.ZLogInformation($"扫描到 {Devices.Count} 个设备");
         }
         catch (Exception ex)

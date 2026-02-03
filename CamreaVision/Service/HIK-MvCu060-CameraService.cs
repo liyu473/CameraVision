@@ -1,4 +1,3 @@
-using CamreaVision.Models;
 using Microsoft.Extensions.Logging;
 using MvCameraControl;
 using ZLogger;
@@ -6,7 +5,7 @@ using ZLogger;
 namespace CamreaVision.Service;
 
 /// <summary>
-/// 海康威视工业相机服务类
+/// 海康威视MvCu060工业相机服务类
 /// 提供相机的初始化、打开、关闭、采集、参数设置等功能
 /// </summary>
 public class HIK_MvCu060_CameraService
