@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CameraVision/CameraVision.csproj" />
+  <Project Path="LyuCameraVision/LyuCameraVision.csproj" />
+</Solution>

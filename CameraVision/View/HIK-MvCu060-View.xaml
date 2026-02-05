@@ -1,0 +1,195 @@
+<UserControl
+    x:Class="CameraVision.View.HIK_MvCu060_View"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="clr-namespace:CameraVision.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:CameraVision.View"
+    xmlns:lyu="http://schemas.lyuwpfhelper.com/winfx/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    xmlns:viewmodel="clr-namespace:CameraVision.ViewModel"
+    d:DataContext="{d:DesignInstance Type=viewmodel:HIK_MvCu060_ViewModel}"
+    d:DesignHeight="600"
+    d:DesignWidth="900"
+    mc:Ignorable="d">
+
+    <!--  资源定义  -->
+    <UserControl.Resources>
+        <converter:DeviceInfoToDisplayNameConverter x:Key="DeviceInfoToDisplayNameConverter" />
+        <converter:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <!--  主布局：上下结构  -->
+    <Grid Margin="12" lyu:GridHelper.RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!--  第一行：设备选择与基本操作  -->
+        <lyu:SimpleStackPanel
+            Grid.Row="0"
+            Margin="0,0,0,8"
+            Orientation="Horizontal"
+            Spacing="12">
+
+            <!--  设备选择下拉框  -->
+            <TextBlock
+                VerticalAlignment="Center"
+                Style="{StaticResource {x:Static ui:ThemeKeys.BodyTextBlockStyleKey}}"
+                Text="选择相机设备：" />
+            <ComboBox
+                MinWidth="200"
+                ItemsSource="{Binding Devices}"
+                SelectedItem="{Binding SelectedDevice}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ., Converter={StaticResource DeviceInfoToDisplayNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <!--  设备操作按钮  -->
+            <Button Command="{Binding ScanDevicesCommand}" Content="扫描设备" />
+            <Button Command="{Binding OpenCameraCommand}" Content="打开相机" />
+            <Button Command="{Binding CloseCameraCommand}" Content="关闭相机" />
+        </lyu:SimpleStackPanel>
+
+        <!--  第二行：采集控制与保存  -->
+        <lyu:SimpleStackPanel
+            Grid.Row="1"
+            Margin="0,0,0,8"
+            Orientation="Horizontal"
+            Spacing="12">
+
+            <!--  采集控制按钮  -->
+            <Button Command="{Binding StartGrabCommand}" Content="开始采集" />
+            <Button Command="{Binding StopGrabCommand}" Content="停止采集" />
+
+            <!--  分隔符  -->
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+            <!--  触发模式控制  -->
+            <ui:ToggleSwitch
+                IsOn="{Binding IsTriggerMode}"
+                OffContent="连续采集"
+                OnContent="触发模式" />
+            <ui:ToggleSwitch
+                IsEnabled="{Binding IsTriggerMode}"
+                IsOn="{Binding IsSoftwareTrigger}"
+                OffContent="硬触发"
+                OnContent="软触发" />
+            <Button Command="{Binding SoftwareTriggerCommand}" Content="执行触发" />
+
+            <!--  分隔符  -->
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+            <!--  图像保存按钮  -->
+            <Button
+                Command="{Binding SaveImageCommand}"
+                CommandParameter="bmp"
+                Content="保存BMP" />
+            <Button
+                Command="{Binding SaveImageCommand}"
+                CommandParameter="jpg"
+                Content="保存JPG" />
+            <Button
+                Command="{Binding SaveImageCommand}"
+                CommandParameter="png"
+                Content="保存PNG" />
+        </lyu:SimpleStackPanel>
+
+        <!--  第三行：图像显示区域  -->
+        <Border
+            Grid.Row="2"
+            Margin="0,4"
+            BorderBrush="Gray"
+            BorderThickness="1">
+            <Grid>
+                <!--  背景提示文字  -->
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="24"
+                    Foreground="LightGray"
+                    Text="图像显示区域"
+                    Visibility="{Binding CurrentImage, Converter={StaticResource NullToVisibilityConverter}}" />
+
+                <!--  使用 WPF Image 控件显示图像  -->
+                <Image
+                    x:Name="displayImage"
+                    Source="{Binding CurrentImage}"
+                    Stretch="Uniform" />
+            </Grid>
+        </Border>
+
+        <!--  第四行：参数设置区域  -->
+        <GroupBox
+            Grid.Row="3"
+            Margin="0,4"
+            Header="相机参数设置">
+            <Grid Margin="8" lyu:GridHelper.ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+                <!--  曝光时间  -->
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Text="曝光时间(μs)：" />
+                <TextBox
+                    Grid.Column="1"
+                    Width="100"
+                    VerticalAlignment="Center"
+                    IsEnabled="{Binding IsCameraOpened}"
+                    Text="{Binding ExposureTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!--  增益  -->
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="增益(dB)：" />
+                <TextBox
+                    Grid.Column="3"
+                    Width="80"
+                    VerticalAlignment="Center"
+                    IsEnabled="{Binding IsCameraOpened}"
+                    Text="{Binding Gain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!--  帧率  -->
+                <TextBlock
+                    Grid.Column="4"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="帧率(fps)：" />
+                <TextBox
+                    Grid.Column="5"
+                    Width="80"
+                    VerticalAlignment="Center"
+                    IsEnabled="{Binding IsCameraOpened}"
+                    Text="{Binding FrameRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!--  参数操作按钮  -->
+                <Button
+                    Grid.Column="6"
+                    Margin="16,0,4,0"
+                    Command="{Binding GetParametersCommand}"
+                    Content="获取参数" />
+                <Button
+                    Grid.Column="7"
+                    Command="{Binding SetParametersCommand}"
+                    Content="应用参数" />
+            </Grid>
+        </GroupBox>
+
+        <!--  第五行：状态栏  -->
+        <Border
+            Grid.Row="4"
+            Margin="0,4,0,0"
+            Padding="8,4"
+            Background="{DynamicResource {x:Static ui:ThemeKeys.SystemControlBackgroundChromeMediumLowBrushKey}}"
+            CornerRadius="4">
+            <TextBlock
+                VerticalAlignment="Center"
+                Style="{StaticResource {x:Static ui:ThemeKeys.CaptionTextBlockStyleKey}}"
+                Text="{Binding StatusText}" />
+        </Border>
+
+    </Grid>
+</UserControl>

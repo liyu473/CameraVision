@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<MetalamaAllowPreviewLanguageFeatures>true</MetalamaAllowPreviewLanguageFeatures>
+		<LangVersion>preview</LangVersion>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="iNKORE.UI.WPF.Modern" Version="0.10.2.1" />
+		<PackageReference Include="LyuExtensions" Version="1.1.8" />
+		<PackageReference Include="LyuLogExtension" Version="1.7.2" />
+		<PackageReference Include="LyuWpfHelper" Version="1.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LyuCameraVision\LyuCameraVision.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="MvCameraControl.Net">
+			<HintPath>..\LyuCameraVision\MvCameraControl.Net.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>
