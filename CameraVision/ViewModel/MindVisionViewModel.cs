@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using LyuCameraVision.Helpers;
 using LyuCameraVision.Models;
 using LyuCameraVision.Service;
+using LyuExtensions.Aspects;
 using LyuWpfHelper.Helpers;
 using LyuWpfHelper.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -13,10 +14,15 @@ using ZLogger;
 
 namespace CameraVision.ViewModel;
 
+[Singleton]
 public partial class MindVisionViewModel : ViewModelBase
 {
+    [Inject]
     private readonly ILogger<MindVisionViewModel> _logger;
+
+    [Inject]
     private readonly IMindCameraService _cameraService;
+
     private DispatcherTimer? _previewTimer;
 
     [ObservableProperty]
@@ -82,14 +88,9 @@ public partial class MindVisionViewModel : ViewModelBase
     }
 
     public MindVisionViewModel(
-        IMindCameraService cameraService,
-        ILogger<MindVisionViewModel> logger
     )
     {
-        _cameraService = cameraService;
-        _logger = logger;
-
-        IsInitialSDK = _cameraService.InitializeSdk();
+        IsInitialSDK = _cameraService!.InitializeSdk();
     }
 
     #region MindVision

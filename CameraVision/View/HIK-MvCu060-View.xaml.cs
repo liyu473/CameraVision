@@ -1,10 +1,12 @@
 using CameraVision.ViewModel;
+using LyuExtensions.Aspects;
 
 namespace CameraVision.View;
 
 /// <summary>
 /// 海康相机视图的交互逻辑
 /// </summary>
+[Singleton]
 public partial class HIK_MvCu060_View : System.Windows.Controls.UserControl
 {
     /// <summary>

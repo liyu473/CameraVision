@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LyuCameraVision.Helpers;
 using LyuCameraVision.Service;
+using LyuExtensions.Aspects;
 using LyuWpfHelper.Helpers;
 using LyuWpfHelper.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ namespace CameraVision.ViewModel;
 /// 海康相机视图模型
 /// 负责相机控制、参数设置、图像采集和显示的逻辑处理
 /// </summary>
+[Singleton]
 public partial class HIK_MvCu060_ViewModel : ViewModelBase, IDisposable
 {
     #region 私有字段
@@ -25,11 +27,13 @@ public partial class HIK_MvCu060_ViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// 相机服务实例
     /// </summary>
+    [Inject]
     private readonly HIK_MvCu060_CameraService _cameraService;
 
     /// <summary>
     /// 日志记录器
     /// </summary>
+    [Inject]
     private readonly ILogger<HIK_MvCu060_ViewModel> _logger;
 
     /// <summary>
@@ -248,12 +252,8 @@ public partial class HIK_MvCu060_ViewModel : ViewModelBase, IDisposable
     /// <param name="service">相机服务实例</param>
     /// <param name="logger">日志记录器</param>
     public HIK_MvCu060_ViewModel(
-        HIK_MvCu060_CameraService service,
-        ILogger<HIK_MvCu060_ViewModel> logger
     )
     {
-        _cameraService = service;
-        _logger = logger;
         _dispatcher = Dispatcher.CurrentDispatcher;
 
         // 初始化时扫描设备

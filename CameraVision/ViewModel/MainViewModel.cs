@@ -2,9 +2,11 @@
 using CameraVision.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LyuWpfHelper.ViewModels;
+using LyuExtensions.Aspects;
 
 namespace CameraVision.ViewModel;
 
+[Singleton]
 public partial class MainViewModel : ViewModelBase
 {
     public MainViewModel()

@@ -1,17 +1,19 @@
 ﻿using CameraVision.ViewModel;
+using LyuExtensions.Aspects;
 
 namespace CameraVision.View;
 
 /// <summary>
 /// MindVisionView.xaml 的交互逻辑
 /// </summary>
+[Singleton]
 public partial class MindVisionView : System.Windows.Controls.UserControl
 {
+    [Inject]
     private readonly MindVisionViewModel _vm;
-    public MindVisionView(MindVisionViewModel vm)
+    public MindVisionView()
     {
         InitializeComponent();
-        DataContext = vm;
-        _vm = vm;
+        DataContext = _vm;
     }
 }

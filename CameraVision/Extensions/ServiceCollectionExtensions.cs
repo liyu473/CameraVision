@@ -1,6 +1,7 @@
 using CameraVision.View;
 using CameraVision.ViewModel;
 using LyuCameraVision.Service;
+using LyuExtensions.Extensions;
 using LyuLogExtension.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,14 +18,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddZLogger();
-        services.AddSingleton<MainWindow>();
-        services.AddSingleton<MainViewModel>();
+        services.RegisterServices();
         services.AddSingleton<IMindCameraService, MindCameraService>();
         services.AddSingleton<HIK_MvCu060_CameraService>();
-        services.AddSingleton<HIK_MvCu060_View>();
-        services.AddSingleton<HIK_MvCu060_ViewModel>();
-        services.AddSingleton<MindVisionView>();
-        services.AddSingleton<MindVisionViewModel>();
 
         return services;
     }
