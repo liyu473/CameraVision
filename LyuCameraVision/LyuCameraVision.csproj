@@ -8,7 +8,7 @@
     
     <!-- NuGet打包配置 -->
     <PackageId>LyuCameraVision</PackageId>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>1.0.2</PackageVersion>
     <Authors>Liyu</Authors>
     <Description>相机服务，迈德威视和海康威视相机指定型号SDK封装。</Description>
     <PackageTags>camera;vision;SDK;MVSDK;Hikvision</PackageTags>
